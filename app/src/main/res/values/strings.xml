@@ -1,3 +1,109 @@
-<resources>
-    <string name="app_name">SoundRecorder</string>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">录音机</string>
+
+    <string name="recording" msgid="4426791467211376099">"录音"</string>
+    <string name="recording_stopped" msgid="1580278719585249612">"录音停止"</string>
+    <string name="storage_is_full" msgid="416039755956726221">"存储空间已满"</string>
+    <string name="max_length_reached" msgid="6398215743584093353">"已达到长度上限"</string>
+    <string name="insert_sd_card" msgid="2251831579676114197">"需要SD卡才可使用"</string>
+    <string name="button_ok" msgid="3004911343723076226">"确定"</string>
+    <!-- no translation found for audio_db_title_format (7912182366970749312) -->
+    <skip />
+    <string name="audio_db_artist_name" msgid="961640229118120080">"您的录音"</string>
+    <string name="audio_db_album_name" msgid="9072588113803264440">"录音"</string>
+    <string name="audio_db_playlist_name" msgid="5592939050047058162">"我的录音"</string>
+    <string name="error_sdcard_access" msgid="8005660724361043509">"无法访问存储器"</string>
+    <string name="error_app_internal" msgid="2365923237657572011">"内部应用程序错误"</string>
+    <string name="error_mediadb_new_record" msgid="2225774949947938064">"无法保存录制的音频"</string>
+
+    <string name="default_record_name">未命名录音</string>
+    <string name="menu_view_record_list">查看录音列表</string>
+    <string name="menu_setting">设置</string>
+    <string name="delete_dialog_title">您确定要删除这段录音吗？</string>
+    <string name="overwrite_dialog_title">%s已存在。\n确定要覆盖这段录音吗？</string>
+    <string name="preferences_title">设置</string>
+    <string name="pref_title_record_type">录音文件类型</string>
+    <string name="prefDialogTitle_recordType">请选择录音文件类型</string>
+    <string name="pref_title_enable_high_quality">使用高质量录音</string>
+    <string name="pref_summary_enable_high_quality">高质量录音会增大录音文件</string>
+    <string name="pref_title_enable_sound_effect">打开音效</string>
+    <string name="pref_summary_enable_sound_effect">操作录音机时播放音效</string>
+    <string name="notification_recording">正在录音...</string>
+    <string name="notification_stopped">录音已终止</string>
+    <string name="notification_warning">存储空间不足(小于%d分钟)</string>
+    <string name="sd_card_not_available">SD卡不存在</string>
+    <string name="open_file_explorer">打开文件夹</string>
+    <string name="alert_message_delete_record">确认要删除所选的录音吗?</string>
+
+
+    <!--&lt;!&ndash; Screen title before and during recording &ndash;&gt;-->
+    <!--&lt;!&ndash; Screen title after recording &ndash;&gt;-->
+    <!--&lt;!&ndash; Screen title while playing back a recording &ndash;&gt;-->
+    <!--&lt;!&ndash; Label shown during recording &ndash;&gt;-->
+    <!--<string name="recording">Recording</string>-->
+    <!--&lt;!&ndash; Label shown when the recording is stopped for a reason other than the user stopping it (e.g. the sd card was removed) &ndash;&gt;-->
+    <!--<string name="recording_stopped">Recording stopped</string>-->
+    <!--&lt;!&ndash; label shown when there is not enough space to record something &ndash;&gt;-->
+    <!--<string name="storage_is_full">Storage is full</string>-->
+    <!--&lt;!&ndash; label shown when the recording has reached maximum allowed file size &ndash;&gt;-->
+    <!--<string name="max_length_reached">Maximum length reached</string>-->
+    <!--&lt;!&ndash; label shown when there is no sd card available to record to &ndash;&gt;-->
+    <!--<string name="insert_sd_card">SD card is required</string>-->
+    <!--&lt;!&ndash; label shown when there is more than 1 minute but less than 9 minutes of space left to record &ndash;&gt;-->
+    <!--&lt;!&ndash; label shown when there is less than 1 minute of space left to record &ndash;&gt;-->
+
+    <!--&lt;!&ndash; button to accept the current recording and return it to the caller &ndash;&gt;-->
+    <!--&lt;!&ndash; button to discard the current recording and return to the caller &ndash;&gt;-->
+    <!--&lt;!&ndash; acknowlegement button in a number of dialogs &ndash;&gt;-->
+    <!--<string name="button_ok">OK</string>-->
+    <!--&lt;!&ndash; Do not translate. Format of the timer that shows how much has been recorded so far &ndash;&gt;-->
+    <string name="timer_format"><xliff:g id="format">%02d</xliff:g>:<xliff:g id="format">%02d</xliff:g></string>
+    <!--&lt;!&ndash; label shown before the user has recorded anything &ndash;&gt;-->
+
+    <!--&lt;!&ndash; the name under which recordings will be visible in the media database is formatted like this &ndash;&gt;-->
+    <string name="audio_db_title_format"><xliff:g id="format">yyyy-MM-dd HH:mm:ss</xliff:g></string>
+    <!--&lt;!&ndash; all recordings will show up in the media database with this 'artist' name &ndash;&gt;-->
+    <!--<string name="audio_db_artist_name">Your recordings</string>-->
+    <!--&lt;!&ndash; all recordings will show up in the media database with this 'album' name &ndash;&gt;-->
+    <!--<string name="audio_db_album_name">Audio recordings</string>-->
+    <!--&lt;!&ndash; all recordings will show up in the media database in a playlist with this name &ndash;&gt;-->
+    <!--<string name="audio_db_playlist_name">My recordings</string>-->
+    <!--&lt;!&ndash; shown as the message in a dialog when an error occured because of an error accessing the sd card &ndash;&gt;-->
+    <!--<string name="error_sdcard_access">Unable to access external or internal storage</string>-->
+    <!--&lt;!&ndash; shown as the message in a dialog when the app encountered an unspecified internal error &ndash;&gt;-->
+    <!--<string name="error_app_internal">Internal application error</string>-->
+    <!--&lt;!&ndash; shown as the message in a dialog when the recording could not be added to the media database &ndash;&gt;-->
+    <!--<string name="error_mediadb_new_record">Unable to save recorded audio</string>-->
+
+    <!--&lt;!&ndash; add for libra begin &ndash;&gt;-->
+    <!--<string name="default_record_name">untitled record</string>-->
+    <!--<string name="menu_view_record_list">View record list</string>-->
+    <!--<string name="menu_setting">Settings</string>-->
+    <!--<string name="delete_dialog_title">Do you want to delete current record?</string>-->
+    <!--<string name="overwrite_dialog_title">%s has already existed. Do you want to overwrite it?</string>-->
+    <!--<string name="preferences_title">Settings</string>-->
+    <!--<string name="pref_title_record_type">Record file type</string>-->
+    <!--<string name="prefDialogTitle_recordType">Please select file type</string>-->
+    <string name="prefDefault_recordType">audio/3gpp</string>
+    <!--<string name="pref_title_enable_high_quality">Enable high quality</string>-->
+    <!--<string name="pref_summary_enable_high_quality">The audio file with high quality can be larger</string>-->
+    <!--<string name="pref_title_enable_sound_effect">Enable sound effect</string>-->
+    <!--<string name="pref_summary_enable_sound_effect">Playing sound effect when the state is changed</string>-->
+    <!--<string name="notification_recording">Recording...</string>-->
+    <!--<string name="notification_stopped">Recording is stopped</string>-->
+    <!--<string name="notification_warning">Low storage(less than %d minutes)...</string>-->
+    <!--<string name="sd_card_not_available">SD card is not available</string>-->
+    <!--<string name="open_file_explorer">Open file explorer</string>-->
+    <!--<string name="alert_message_delete_record">Do you want to delete selected record?</string>-->
+
+    <string-array name="prefEntries_recordType">
+        <item>amr</item>
+        <item>3gpp</item>
+    </string-array>
+    <string-array name="prefValues_recordType" translatable="false">
+        <item>audio/amr</item>
+        <item>audio/3gpp</item>
+    </string-array>
+    <!--&lt;!&ndash; add for libra end &ndash;&gt;-->
+
 </resources>
