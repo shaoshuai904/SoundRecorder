@@ -1,5 +1,6 @@
 package com.maple.soundrecorder;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -38,84 +39,68 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.maple.soundrecorder.utils.permission.PermissionFragment;
+import com.maple.soundrecorder.utils.permission.PermissionListener;
+import com.maple.soundrecorder.view.RecordNameEditText;
+import com.maple.soundrecorder.view.WheelImageView;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 
-public class SoundRecorder extends Activity implements Button.OnClickListener,
-        Recorder.OnStateChangedListener {
-    private static final String TAG = "SoundRecorder";
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
+public class MainActivity extends Activity implements Button.OnClickListener, Recorder.OnStateChangedListener {
+    private static final String TAG = "MainActivity";
     private static final String RECORDER_STATE_KEY = "recorder_state";
-
     private static final String SAMPLE_INTERRUPTED_KEY = "sample_interrupted";
-
     private static final String MAX_FILE_SIZE_KEY = "max_file_size";
-
     private static final String AUDIO_3GPP = "audio/3gpp";
-
     private static final String AUDIO_AMR = "audio/amr";
-
     private static final String AUDIO_ANY = "audio/*";
-
     private static final String ANY_ANY = "*/*";
-
     private static final String FILE_EXTENSION_AMR = ".amr";
-
     private static final String FILE_EXTENSION_3GPP = ".3gpp";
 
     public static final int BITRATE_AMR = 2 * 1024 * 8; // bits/sec
-
     public static final int BITRATE_3GPP = 20 * 1024 * 8; // bits/sec
 
     private static final int SEEK_BAR_MAX = 10000;
-
     private static final long WHEEL_SPEED_NORMAL = 1800;
-
     private static final long WHEEL_SPEED_FAST = 300;
-
     private static final long WHEEL_SPEED_SUPER_FAST = 100;
-
     private static final long SMALL_WHEEL_SPEED_NORMAL = 900;
-
     private static final long SMALL_WHEEL_SPEED_FAST = 200;
-
     private static final long SMALL_WHEEL_SPEED_SUPER_FAST = 200;
 
     private String mRequestedType = AUDIO_ANY;
-
     private boolean mCanRequestChanged = false;
 
     private Recorder mRecorder;
-
     private RecorderReceiver mReceiver;
 
     private boolean mSampleInterrupted = false;
-
     private boolean mShowFinishButton = false;
 
     private String mErrorUiMessage = null; // Some error messages are displayed
     // in the UI, not a dialog. This
     // happens when a recording
     // is interrupted for some reason.
-
     private long mMaxFileSize = -1; // can be specified in the intent
 
     private RemainingTimeCalculator mRemainingTimeCalculator;
 
     private String mTimerFormat;
-
     private SoundPool mSoundPool;
 
     private int mPlaySound;
-
     private int mPauseSound;
 
     private HashSet<String> mSavedRecord;
 
     private long mLastClickTime;
-
     private int mLastButtonId;
 
     private final Handler mHandler = new Handler();
@@ -146,41 +131,28 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
         }
     };
 
-    private ImageButton mNewButton;
 
-    private ImageButton mFinishButton;
+    @BindView(R.id.newButton) ImageButton mNewButton;
+    @BindView(R.id.finishButton) ImageButton mFinishButton;
+    @BindView(R.id.recordButton) ImageButton mRecordButton;
+    @BindView(R.id.stopButton) ImageButton mStopButton;
+    @BindView(R.id.playButton) ImageButton mPlayButton;
+    @BindView(R.id.pauseButton) ImageButton mPauseButton;
+    @BindView(R.id.deleteButton) ImageButton mDeleteButton;
 
-    private ImageButton mRecordButton;
+    @BindView(R.id.wheel_left) WheelImageView mWheelLeft;
+    @BindView(R.id.wheel_right) WheelImageView mWheelRight;
+    @BindView(R.id.wheel_small_left) WheelImageView mSmallWheelLeft;
+    @BindView(R.id.wheel_small_right) WheelImageView mSmallWheelRight;
+    @BindView(R.id.file_name) RecordNameEditText mFileNameEditText;
 
-    private ImageButton mStopButton;
+    @BindView(R.id.time_calculator) LinearLayout mTimerLayout;
+    @BindView(R.id.vumeter_layout) LinearLayout mVUMeterLayout;
+    @BindView(R.id.play_seek_bar_layout) LinearLayout mSeekBarLayout;
 
-    private ImageButton mPlayButton;
-
-    private ImageButton mPauseButton;
-
-    private ImageButton mDeleteButton;
-
-    private WheelImageView mWheelLeft;
-
-    private WheelImageView mWheelRight;
-
-    private WheelImageView mSmallWheelLeft;
-
-    private WheelImageView mSmallWheelRight;
-
-    private RecordNameEditText mFileNameEditText;
-
-    private LinearLayout mTimerLayout;
-
-    private LinearLayout mVUMeterLayout;
-
-    private LinearLayout mSeekBarLayout;
-
-    private TextView mStartTime;
-
-    private TextView mTotalTime;
-
-    private SeekBar mPlaySeekBar;
+    @BindView(R.id.starttime) TextView mStartTime;
+    @BindView(R.id.totaltime) TextView mTotalTime;
+    @BindView(R.id.play_seek_bar) SeekBar mPlaySeekBar;
 
     private BroadcastReceiver mSDCardMountEventReceiver = null;
 
@@ -193,6 +165,25 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
         super.onCreate(icycle);
         initInternalState(getIntent());
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        PermissionFragment.getPermissionFragment(this)
+                .setPermissionListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted() {
+                    }
+
+                    @Override
+                    public void onPermissionDenied(String[] deniedPermissions) {
+                        Toast.makeText(getBaseContext(), "不同意将无法使用", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .checkPermissions(new String[]{
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.RECORD_AUDIO
+                });
+
 
         mRecorder = new Recorder(this);
         mRecorder.setOnStateChangedListener(this);
@@ -257,7 +248,7 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
         }
 
         if (AUDIO_ANY.equals(mRequestedType)) {
-            mRequestedType = SoundRecorderPreferenceActivity.getRecordType(this);
+            mRequestedType = SettingActivity.getRecordType(this);
         } else if (ANY_ANY.equals(mRequestedType)) {
             mRequestedType = AUDIO_3GPP;
         }
@@ -295,13 +286,6 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
      * to reinitialize references to the views.
      */
     private void initResourceRefs() {
-        mNewButton = (ImageButton) findViewById(R.id.newButton);
-        mFinishButton = (ImageButton) findViewById(R.id.finishButton);
-        mRecordButton = (ImageButton) findViewById(R.id.recordButton);
-        mStopButton = (ImageButton) findViewById(R.id.stopButton);
-        mPlayButton = (ImageButton) findViewById(R.id.playButton);
-        mPauseButton = (ImageButton) findViewById(R.id.pauseButton);
-        mDeleteButton = (ImageButton) findViewById(R.id.deleteButton);
         mNewButton.setOnClickListener(this);
         mFinishButton.setOnClickListener(this);
         mRecordButton.setOnClickListener(this);
@@ -309,12 +293,6 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
         mPlayButton.setOnClickListener(this);
         mPauseButton.setOnClickListener(this);
         mDeleteButton.setOnClickListener(this);
-
-        mWheelLeft = (WheelImageView) findViewById(R.id.wheel_left);
-        mWheelRight = (WheelImageView) findViewById(R.id.wheel_right);
-        mSmallWheelLeft = (WheelImageView) findViewById(R.id.wheel_small_left);
-        mSmallWheelRight = (WheelImageView) findViewById(R.id.wheel_small_right);
-        mFileNameEditText = (RecordNameEditText) findViewById(R.id.file_name);
 
         resetFileNameEditText();
         mFileNameEditText.setNameChangeListener(new RecordNameEditText.OnNameChangeListener() {
@@ -326,12 +304,6 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
             }
         });
 
-        mTimerLayout = (LinearLayout) findViewById(R.id.time_calculator);
-        mVUMeterLayout = (LinearLayout) findViewById(R.id.vumeter_layout);
-        mSeekBarLayout = (LinearLayout) findViewById(R.id.play_seek_bar_layout);
-        mStartTime = (TextView) findViewById(R.id.starttime);
-        mTotalTime = (TextView) findViewById(R.id.totaltime);
-        mPlaySeekBar = (SeekBar) findViewById(R.id.play_seek_bar);
         mPlaySeekBar.setMax(SEEK_BAR_MAX);
         mPlaySeekBar.setOnSeekBarChangeListener(mSeekBarChangeListener);
 
@@ -488,7 +460,7 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
         } else {
             stopAudioPlayback();
 
-            boolean isHighQuality = SoundRecorderPreferenceActivity.isHighQuality(this);
+            boolean isHighQuality = SettingActivity.isHighQuality(this);
             if (AUDIO_AMR.equals(mRequestedType)) {
                 mRemainingTimeCalculator.setBitRate(BITRATE_AMR);
                 int outputfileformat = isHighQuality ? MediaRecorder.OutputFormat.AMR_WB
@@ -549,7 +521,7 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
     @Override
     protected void onResume() {
         super.onResume();
-        String type = SoundRecorderPreferenceActivity.getRecordType(this);
+        String type = SettingActivity.getRecordType(this);
         if (mCanRequestChanged && !TextUtils.equals(type, mRequestedType)) {
             saveSample();
             mRecorder.reset();
@@ -1089,7 +1061,7 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
                 if (mRecorder.sampleLength() > 0) {
                     if (mRecorder.state() == Recorder.PLAYING_PAUSED_STATE) {
                         stopAnimation();
-                        if (SoundRecorderPreferenceActivity.isEnabledSoundEffect(this)) {
+                        if (SettingActivity.isEnabledSoundEffect(this)) {
                             mSoundPool.play(mPauseSound, 1.0f, 1.0f, 0, 0, 1);
                         }
                     } else {
@@ -1148,7 +1120,7 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
 
                 mFileNameEditText.setEnabled(false);
 
-                if (SoundRecorderPreferenceActivity.isEnabledSoundEffect(this)) {
+                if (SettingActivity.isEnabledSoundEffect(this)) {
                     mSoundPool.play(mPlaySound, 1.0f, 1.0f, 0, 0, 1);
                 }
                 startRecordPlayingAnimation();
@@ -1193,8 +1165,13 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
                 break;
         }
         if (message != null) {
-            new AlertDialog.Builder(this).setTitle(R.string.app_name).setMessage(message)
-                    .setPositiveButton(R.string.button_ok, null).setCancelable(false).show();
+            new AlertDialog
+                    .Builder(this)
+                    .setTitle(R.string.app_name)
+                    .setMessage(message)
+                    .setPositiveButton(R.string.button_ok, null)
+                    .setCancelable(false)
+                    .show();
         }
     }
 
@@ -1223,7 +1200,7 @@ public class SoundRecorder extends Activity implements Button.OnClickListener,
                 startActivity(intent);
                 break;
             case R.id.menu_setting:
-                intent = new Intent(this, SoundRecorderPreferenceActivity.class);
+                intent = new Intent(this, SettingActivity.class);
                 startActivity(intent);
                 break;
             default:

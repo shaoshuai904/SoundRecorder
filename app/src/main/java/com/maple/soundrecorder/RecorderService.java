@@ -3,7 +3,6 @@ package com.maple.soundrecorder;
 import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +16,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -101,7 +101,7 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
         mTeleManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         mTeleManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SoundRecorder");
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MainActivity");
         mKeyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
     }
 
@@ -170,12 +170,12 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
             mRecorder = new MediaRecorder();
             mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             if (outputfileformat == MediaRecorder.OutputFormat.THREE_GPP) {
-                mRemainingTimeCalculator.setBitRate(SoundRecorder.BITRATE_3GPP);
+                mRemainingTimeCalculator.setBitRate(MainActivity.BITRATE_3GPP);
                 mRecorder.setAudioSamplingRate(highQuality ? 44100 : 22050);
                 mRecorder.setOutputFormat(outputfileformat);
                 mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             } else {
-                mRemainingTimeCalculator.setBitRate(SoundRecorder.BITRATE_AMR);
+                mRemainingTimeCalculator.setBitRate(MainActivity.BITRATE_AMR);
                 mRecorder.setAudioSamplingRate(highQuality ? 16000 : 8000);
                 mRecorder.setOutputFormat(outputfileformat);
                 mRecorder.setAudioEncoder(highQuality ? MediaRecorder.AudioEncoder.AMR_WB
@@ -236,17 +236,20 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
     }
 
     private void showRecordingNotification() {
-        Notification notification = new Notification(R.drawable.stat_sys_call_record,
-                getString(R.string.notification_recording), System.currentTimeMillis());
-        notification.flags = Notification.FLAG_ONGOING_EVENT;
-        PendingIntent pendingIntent;
-        pendingIntent = PendingIntent
-                .getActivity(this, 0, new Intent(this, SoundRecorder.class), 0);
+        String s = getString(R.string.notification_recording);
+        showToast(s);
+
+//        Notification notification = new Notification(R.drawable.stat_sys_call_record,
+//                getString(R.string.notification_recording), System.currentTimeMillis());
+//        notification.flags = Notification.FLAG_ONGOING_EVENT;
+//        PendingIntent pendingIntent;
+//        pendingIntent = PendingIntent
+//                .getActivity(this, 0, new Intent(this, MainActivity.class), 0);
 
 //        notification.setLatestEventInfo(this, getString(R.string.app_name),
 //                getString(R.string.notification_recording), pendingIntent);
 
-        startForeground(NOTIFICATION_ID, notification);
+//        startForeground(NOTIFICATION_ID, notification);
     }
 
     private void showLowStorageNotification(int minutes) {
@@ -255,40 +258,47 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
             return;
         }
 
-        if (mLowStorageNotification == null) {
-            mLowStorageNotification = new Notification(R.drawable.stat_sys_call_record_full,
-                    getString(R.string.notification_recording), System.currentTimeMillis());
-            mLowStorageNotification.flags = Notification.FLAG_ONGOING_EVENT;
-        }
+        String s = getString(R.string.notification_recording);
+        showToast(s);
 
-        PendingIntent pendingIntent;
-        pendingIntent = PendingIntent
-                .getActivity(this, 0, new Intent(this, SoundRecorder.class), 0);
-
+//        if (mLowStorageNotification == null) {
+//            mLowStorageNotification = new Notification(R.drawable.stat_sys_call_record_full,
+//                    getString(R.string.notification_recording), System.currentTimeMillis());
+//            mLowStorageNotification.flags = Notification.FLAG_ONGOING_EVENT;
+//        }
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+//                new Intent(this, MainActivity.class), 0);
 //        mLowStorageNotification.setLatestEventInfo(this, getString(R.string.app_name),
 //                getString(R.string.notification_warning, minutes), pendingIntent);
-        startForeground(NOTIFICATION_ID, mLowStorageNotification);
+//        startForeground(NOTIFICATION_ID, mLowStorageNotification);
     }
 
     private void showStoppedNotification() {
         stopForeground(true);
         mLowStorageNotification = null;
 
-        Notification notification = new Notification(R.drawable.stat_sys_call_record,
-                getString(R.string.notification_stopped), System.currentTimeMillis());
-        notification.flags = Notification.FLAG_AUTO_CANCEL;
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setType("audio/*");
-        intent.setDataAndType(Uri.fromFile(new File(mFilePath)), "audio/*");
+        String s = getString(R.string.notification_stopped) + Uri.fromFile(new File(mFilePath)).toString();
+        showToast(s);
 
-        PendingIntent pendingIntent;
-        pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
+//        Notification notification = new Notification(R.drawable.stat_sys_call_record,
+//                getString(R.string.notification_stopped), System.currentTimeMillis());
+//        notification.flags = Notification.FLAG_AUTO_CANCEL;
+//        Intent intent = new Intent(Intent.ACTION_VIEW);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.setType("audio/*");
+//        intent.setDataAndType(Uri.fromFile(new File(mFilePath)), "audio/*");
+//
+//        PendingIntent pendingIntent;
+//        pendingIntent = PendingIntent.getActivity(this, 0, intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
+//
 //        notification.setLatestEventInfo(this, getString(R.string.app_name),
 //                getString(R.string.notification_stopped), pendingIntent);
-        mNotifiManager.notify(NOTIFICATION_ID, notification);
+//        mNotifiManager.notify(NOTIFICATION_ID, notification);
+    }
+
+    public void showToast(String str) {
+        Toast.makeText(getBaseContext(), str, Toast.LENGTH_SHORT).show();
     }
 
     private void sendStateBroadcast() {
@@ -331,8 +341,7 @@ public class RecorderService extends Service implements MediaRecorder.OnErrorLis
         return mStartTime;
     }
 
-    public static void startRecording(Context context, int outputfileformat, String path,
-                                      boolean highQuality, long maxFileSize) {
+    public static void startRecording(Context context, int outputfileformat, String path, boolean highQuality, long maxFileSize) {
         Intent intent = new Intent(context, RecorderService.class);
         intent.putExtra(ACTION_NAME, ACTION_START_RECORDING);
         intent.putExtra(ACTION_PARAM_FORMAT, outputfileformat);

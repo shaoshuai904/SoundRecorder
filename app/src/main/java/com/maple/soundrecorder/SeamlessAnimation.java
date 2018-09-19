@@ -4,29 +4,22 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
 public class SeamlessAnimation extends Animation {
-
     private float mFromDegrees;
-
     private float mToDegrees;
 
     private float mPivotX;
-
     private float mPivotY;
 
     private int mPivotXType;
-
     private float mPivotXValue;
-
     private int mPivotYType;
-
     private float mPivotYValue;
 
     private boolean mCancelled;
-
     private float mDegree;
 
     public SeamlessAnimation(float fromDegrees, float toDegrees, int pivotXType, float pivotXValue,
-            int pivotYType, float pivotYValue) {
+                             int pivotYType, float pivotYValue) {
         mFromDegrees = fromDegrees;
         mToDegrees = toDegrees;
         mPivotXType = pivotXType;

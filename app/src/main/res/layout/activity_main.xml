@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/tape_bottom" />
 
-            <com.maple.soundrecorder.WheelImageView
+            <com.maple.soundrecorder.view.WheelImageView
                 android:id="@+id/wheel_left"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
                 android:layout_marginTop="60dip"
                 android:src="@drawable/wheel_left" />
 
-            <com.maple.soundrecorder.WheelImageView
+            <com.maple.soundrecorder.view.WheelImageView
                 android:id="@+id/wheel_right"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                 android:layout_marginTop="60dip"
                 android:src="@drawable/wheel_right" />
 
-            <com.maple.soundrecorder.WheelImageView
+            <com.maple.soundrecorder.view.WheelImageView
                 android:id="@+id/wheel_small_left"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
                 android:layout_marginLeft="30dip"
                 android:src="@drawable/wheel_small_left" />
 
-            <com.maple.soundrecorder.WheelImageView
+            <com.maple.soundrecorder.view.WheelImageView
                 android:id="@+id/wheel_small_right"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
                     android:focusable="true"
                     android:focusableInTouchMode="true" />
 
-                <com.maple.soundrecorder.RecordNameEditText
+                <com.maple.soundrecorder.view.RecordNameEditText
                     android:id="@+id/file_name"
                     android:layout_width="220dip"
                     android:layout_height="25dip"

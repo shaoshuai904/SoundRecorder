@@ -1,10 +1,12 @@
-package com.maple.soundrecorder;
+package com.maple.soundrecorder.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
+
+import com.maple.soundrecorder.SeamlessAnimation;
 
 public class WheelImageView extends ImageView {
 

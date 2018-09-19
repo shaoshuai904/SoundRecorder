@@ -6,7 +6,13 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-public class SoundRecorderPreferenceActivity extends PreferenceActivity {
+/**
+ * 偏好设置
+ *
+ * @author maple
+ * @time 2018/9/19.
+ */
+public class SettingActivity extends PreferenceActivity {
     private static final String RECORD_TYPE = "pref_key_record_type";
 
     private static final String ENABLE_HIGH_QUALITY = "pref_key_enable_high_quality";

@@ -1,4 +1,4 @@
-package com.maple.soundrecorder;
+package com.maple.soundrecorder.view;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import com.maple.soundrecorder.R;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
