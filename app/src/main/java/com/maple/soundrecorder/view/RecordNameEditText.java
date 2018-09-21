@@ -2,11 +2,11 @@ package com.maple.soundrecorder.view;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.support.v7.widget.AppCompatEditText;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 
 import com.maple.soundrecorder.R;
 
@@ -14,7 +14,11 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class RecordNameEditText extends EditText {
+/**
+ * @author maple
+ * @time 2018/9/20.
+ */
+public class RecordNameEditText extends AppCompatEditText {
 
     private Context mContext;
 
@@ -29,16 +33,11 @@ public class RecordNameEditText extends EditText {
     private String mOriginalName;
 
     public interface OnNameChangeListener {
-
         void onNameChanged(String name);
     }
 
     public RecordNameEditText(Context context) {
-        super(context, null);
-        mContext = context;
-        mInputMethodManager = (InputMethodManager) context
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
-        mNameChangeListener = null;
+        this(context,null);
     }
 
     public RecordNameEditText(Context context, AttributeSet attrs) {

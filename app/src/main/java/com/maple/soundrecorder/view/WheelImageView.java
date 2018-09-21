@@ -1,14 +1,20 @@
 package com.maple.soundrecorder.view;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.widget.ImageView;
 
 import com.maple.soundrecorder.SeamlessAnimation;
 
-public class WheelImageView extends ImageView {
+/**
+ * 滚动车轮
+ *
+ * @author maple
+ * @time 2018/9/20.
+ */
+public class WheelImageView extends AppCompatImageView {
 
     SeamlessAnimation mAnimation;
 

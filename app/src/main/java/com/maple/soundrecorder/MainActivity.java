@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 import com.maple.soundrecorder.utils.permission.PermissionFragment;
 import com.maple.soundrecorder.utils.permission.PermissionListener;
+import com.maple.soundrecorder.view.MsTimerView;
 import com.maple.soundrecorder.view.RecordNameEditText;
 import com.maple.soundrecorder.view.WheelImageView;
 
@@ -92,7 +93,7 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
 
     private RemainingTimeCalculator mRemainingTimeCalculator;
 
-    private String mTimerFormat;
+
     private SoundPool mSoundPool;
 
     private int mPlaySound;
@@ -132,6 +133,9 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
     };
 
 
+    @BindView(R.id.tv_open_file) TextView tv_open_file;
+    @BindView(R.id.tv_setting) TextView tv_setting;
+
     @BindView(R.id.newButton) ImageButton mNewButton;
     @BindView(R.id.finishButton) ImageButton mFinishButton;
     @BindView(R.id.recordButton) ImageButton mRecordButton;
@@ -146,7 +150,7 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
     @BindView(R.id.wheel_small_right) WheelImageView mSmallWheelRight;
     @BindView(R.id.file_name) RecordNameEditText mFileNameEditText;
 
-    @BindView(R.id.time_calculator) LinearLayout mTimerLayout;
+    @BindView(R.id.time_calculator) MsTimerView mTimerLayout;// time
     @BindView(R.id.vumeter_layout) LinearLayout mVUMeterLayout;
     @BindView(R.id.play_seek_bar_layout) LinearLayout mSeekBarLayout;
 
@@ -181,6 +185,9 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
                 .checkPermissions(new String[]{
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.INTERNET,
+                        Manifest.permission.WAKE_LOCK,
+                        Manifest.permission.READ_PHONE_STATE,
                         Manifest.permission.RECORD_AUDIO
                 });
 
@@ -286,6 +293,9 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
      * to reinitialize references to the views.
      */
     private void initResourceRefs() {
+        tv_open_file.setOnClickListener(this);
+        tv_setting.setOnClickListener(this);
+
         mNewButton.setOnClickListener(this);
         mFinishButton.setOnClickListener(this);
         mRecordButton.setOnClickListener(this);
@@ -306,8 +316,6 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
 
         mPlaySeekBar.setMax(SEEK_BAR_MAX);
         mPlaySeekBar.setOnSeekBarChangeListener(mSeekBarChangeListener);
-
-        mTimerFormat = getResources().getString(R.string.timer_format);
 
         if (mShowFinishButton) {
             mNewButton.setVisibility(View.GONE);
@@ -418,6 +426,16 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
         mLastButtonId = button.getId();
 
         switch (button.getId()) {
+            case R.id.tv_open_file:
+                saveSample();
+                Intent intent = new Intent();
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
+                intent.setData(Uri.parse("file://" + mRecorder.getRecordDir()));
+                startActivity(intent);
+                break;
+            case R.id.tv_setting:
+                startActivity(new Intent(this, SettingActivity.class));
+                break;
             case R.id.newButton:
                 mFileNameEditText.clearFocus();
                 saveSample();
@@ -640,23 +658,22 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
     }
 
     private void showDeleteConfirmDialog() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        dialogBuilder.setIcon(android.R.drawable.ic_dialog_alert);
-        dialogBuilder.setTitle(R.string.delete_dialog_title);
-        dialogBuilder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mRecorder.delete();
-            }
-        });
-        dialogBuilder.setNegativeButton(android.R.string.cancel,
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.delete_dialog_title)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mRecorder.delete();
+                    }
+                }).setNegativeButton(android.R.string.cancel,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mLastButtonId = 0;
                     }
-                });
-        dialogBuilder.show();
+                })
+                .show();
     }
 
     private void showOverwriteConfirmDialogIfConflicts() {
@@ -664,26 +681,25 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
                 + (AUDIO_AMR.equals(mRequestedType) ? FILE_EXTENSION_AMR : FILE_EXTENSION_3GPP);
 
         if (mRecorder.isRecordExisted(fileName) && !mShowFinishButton) {
-            // file already existed and it's not a recording request from other
-            // app
-            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-            dialogBuilder.setIcon(android.R.drawable.ic_dialog_alert);
-            dialogBuilder.setTitle(getString(R.string.overwrite_dialog_title, fileName));
-            dialogBuilder.setPositiveButton(android.R.string.ok,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            startRecording();
-                        }
-                    });
-            dialogBuilder.setNegativeButton(android.R.string.cancel,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mLastButtonId = 0;
-                        }
-                    });
-            dialogBuilder.show();
+            // file already existed and it's not a recording request from other app
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getString(R.string.overwrite_dialog_title, fileName))
+                    .setPositiveButton(android.R.string.ok,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    startRecording();
+                                }
+                            })
+                    .setNegativeButton(android.R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    mLastButtonId = 0;
+                                }
+                            })
+                    .show();
         } else {
             startRecording();
         }
@@ -815,8 +831,7 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
         long current = System.currentTimeMillis();
         long modDate = file.lastModified();
         Date date = new Date(current);
-        SimpleDateFormat formatter = new SimpleDateFormat(
-                res.getString(R.string.audio_db_title_format));
+        SimpleDateFormat formatter = new SimpleDateFormat(res.getString(R.string.audio_db_title_format));
         String title = formatter.format(date);
         long sampleLengthMillis = mRecorder.sampleLength() * 1000L;
 
@@ -854,50 +869,6 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
         return result;
     }
 
-    private ImageView getTimerImage(char number) {
-        ImageView image = new ImageView(this);
-        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        if (number != ':') {
-            image.setBackgroundResource(R.drawable.background_number);
-        }
-        switch (number) {
-            case '0':
-                image.setImageResource(R.drawable.number_0);
-                break;
-            case '1':
-                image.setImageResource(R.drawable.number_1);
-                break;
-            case '2':
-                image.setImageResource(R.drawable.number_2);
-                break;
-            case '3':
-                image.setImageResource(R.drawable.number_3);
-                break;
-            case '4':
-                image.setImageResource(R.drawable.number_4);
-                break;
-            case '5':
-                image.setImageResource(R.drawable.number_5);
-                break;
-            case '6':
-                image.setImageResource(R.drawable.number_6);
-                break;
-            case '7':
-                image.setImageResource(R.drawable.number_7);
-                break;
-            case '8':
-                image.setImageResource(R.drawable.number_8);
-                break;
-            case '9':
-                image.setImageResource(R.drawable.number_9);
-                break;
-            case ':':
-                image.setImageResource(R.drawable.colon);
-                break;
-        }
-        image.setLayoutParams(lp);
-        return image;
-    }
 
     /**
      * Update the big MM:SS timer. If we are in playback, also update the
@@ -909,11 +880,7 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
         boolean ongoing = state == Recorder.RECORDING_STATE || state == Recorder.PLAYING_STATE;
 
         long time = mRecorder.progress();
-        String timeStr = String.format(mTimerFormat, time / 60, time % 60);
-        mTimerLayout.removeAllViews();
-        for (int i = 0; i < timeStr.length(); i++) {
-            mTimerLayout.addView(getTimerImage(timeStr.charAt(i)));
-        }
+        mTimerLayout.setTimerView(time);
 
         if (state == Recorder.RECORDING_STATE) {
             updateTimeRemaining();
@@ -924,14 +891,6 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
         }
     }
 
-    private void setTimerView(float progress) {
-        long time = (long) (progress * mRecorder.sampleLength());
-        String timeStr = String.format(mTimerFormat, time / 60, time % 60);
-        mTimerLayout.removeAllViews();
-        for (int i = 0; i < timeStr.length(); i++) {
-            mTimerLayout.addView(getTimerImage(timeStr.charAt(i)));
-        }
-    }
 
     private void updateSeekBar() {
         if (mRecorder.state() == Recorder.PLAYING_STATE) {
@@ -1051,6 +1010,8 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
 
                     mVUMeterLayout.setVisibility(View.GONE);
                     mSeekBarLayout.setVisibility(View.VISIBLE);
+
+                    String mTimerFormat = getResources().getString(R.string.timer_format);
                     mStartTime.setText(String.format(mTimerFormat, 0, 0));
                     mTotalTime.setText(String.format(mTimerFormat, mRecorder.sampleLength() / 60,
                             mRecorder.sampleLength() % 60));
@@ -1256,7 +1217,8 @@ public class MainActivity extends Activity implements Button.OnClickListener, Re
                     mProgress = progress;
                 }
 
-                setTimerView(((float) progress) / SEEK_BAR_MAX);
+                long time = (long) (((float) progress) / SEEK_BAR_MAX * mRecorder.sampleLength());
+                mTimerLayout.setTimerView(time);
                 mLastButtonId = 0;
             }
         }
